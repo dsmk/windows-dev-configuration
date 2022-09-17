@@ -9,9 +9,9 @@
 				{
 					"PackageIdentifier" : "Canonical.Ubuntu.2204"
 				},
-				{
-					"PackageIdentifier" : "Canonical.Ubuntu"
-				},
+				// {
+				// 	"PackageIdentifier" : "Canonical.Ubuntu"
+				// },
 				// {
 				// 	"PackageIdentifier" : "Docker.DockerDesktop"
 				// },
