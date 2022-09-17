@@ -12,9 +12,9 @@
 				{
 					"PackageIdentifier" : "Canonical.Ubuntu"
 				},
-				{
-					"PackageIdentifier" : "Docker.DockerDesktop"
-				},
+				// {
+				// 	"PackageIdentifier" : "Docker.DockerDesktop"
+				// },
 				{
 					"PackageIdentifier" : "GitHub.cli"
 				},
@@ -25,7 +25,13 @@
 					"PackageIdentifier" : "Microsoft.EdgeWebView2Runtime"
 				},
 				{
+					"PackageIdentifier" : "Microsoft.OneDrive"
+				},
+				{
 					"PackageIdentifier" : "Microsoft.WindowsTerminal"
+				},
+				{ 
+					"PackageIdentifier" : "Mozilla.firefox"
 				},
 				{
 					"PackageIdentifier" : "Valve.Steam"
