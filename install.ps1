@@ -10,7 +10,29 @@ Write-Output "Filename is $AppList"
 # Now make certain that all the packages have been gotten
 winget import -i "$AppList"
 
+# 
+# Make certain that the git config is set properly
+#
+function Set-GitGlobalConfig {
+    param (
+        $ConfigOption,
+        $ConfigValue
+    )
 
+    # Get the current value
+    $CurrentValue = git config --global "$ConfigOption"
+
+    Write-Debug "${ConfigOption}: current=(${CurrentValue}) desired=(${ConfigValue})"
+    if ($CurrentValue -eq $ConfigValue) {
+        Write-Output "Set-GitGlobalConfig(${ConfigOption}): Value already set to ${ConfigValue}"
+    } else {
+        git config --global "$ConfigOption" "$ConfigValue"
+        Write-Output "Set-GitGlobalConfig(${ConfigOption}): Set value to ${ConfigValue}"
+    }
+}
+
+Set-GitGlobalConfig "user.email" "dsmk@bu.edu"
+Set-GitGlobalConfig "user.name" "David King"
 # 
 # Configuration EnvironmentVariable_Path
 # {
