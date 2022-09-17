@@ -16,6 +16,9 @@
 				// 	"PackageIdentifier" : "Docker.DockerDesktop"
 				// },
 				{
+					"PackageIdentifier" : "Git.Git"
+				},
+				{
 					"PackageIdentifier" : "GitHub.cli"
 				},
 				{
