@@ -24,8 +24,8 @@ if ($Debug) {
 #
 function Set-GitGlobalConfig {
     param (
-        $ConfigOption,
-        $ConfigValue
+        [string]$ConfigOption,
+        [string]$ConfigValue
     )
 
     # Get the current value
