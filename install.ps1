@@ -1,4 +1,9 @@
 # 
+param(
+    [switch] $Debug
+)
+# write-OUtput "Debug=$Debug"
+
 $AppListUrl = "https://raw.githubusercontent.com/dsmk/windows-dev-configuration/main/winget-app.json"
 
 # Download the winget app list to a temporary file
@@ -8,7 +13,11 @@ Invoke-WebRequest -Uri $AppListUrl -OutFile $AppList
 Write-Output "Filename is $AppList"
 
 # Now make certain that all the packages have been gotten
-winget import -i "$AppList"
+if ($Debug) {
+    Write-Output "WOULD execute winget import"
+} else {
+    winget import -i "$AppList"
+}
 
 # 
 # Make certain that the git config is set properly
@@ -26,8 +35,12 @@ function Set-GitGlobalConfig {
     if ($CurrentValue -eq $ConfigValue) {
         Write-Output "Set-GitGlobalConfig(${ConfigOption}): Value already set to ${ConfigValue}"
     } else {
-        git config --global "$ConfigOption" "$ConfigValue"
-        Write-Output "Set-GitGlobalConfig(${ConfigOption}): Set value to ${ConfigValue}"
+        if ($Debug) {
+            Write-Output "Set-GitGlobalConfig(${ConfigOption}): WOULD set value to ${ConfigValue}"
+        } else {
+            git config --global "$ConfigOption" "$ConfigValue"
+            Write-Output "Set-GitGlobalConfig(${ConfigOption}): Set value to ${ConfigValue}"
+        }
     }
 }
 
