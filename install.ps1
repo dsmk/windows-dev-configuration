@@ -43,9 +43,28 @@ function Set-GitGlobalConfig {
         }
     }
 }
+function Set-WindowsOptionalFeature {
+    param (
+        [string]$Feature
+    )
+    #Write-Output "test"
+    $state = Get-WindowsOptionalFeature -Online -FeatureName $Feature | % State
+    #Write-Output "test=$state"
+    if ($state -eq "Disabled") {
+        if ($Debug) {
+            write-Output "${Feature} enable"
+        } else {
+            Write-Output "${$Feature} enabling feature"
+            Enable-WindowsOptionalFeature -Online -FeatureName $Feature
+        }
+    }
+}
 
 Set-GitGlobalConfig "user.email" "dsmk@bu.edu"
 Set-GitGlobalConfig "user.name" "David King"
+
+Set-WindowsOptionalFeature VirtualMachinePlatform
+Set-WindowsOptionalFeature Microsoft-Windows-Subsystem-Linux
 
 # 
 # Clone a copy of configuration repo if not already done
@@ -62,6 +81,7 @@ if (Test-Path -Path $repodir) {
         git clone "$repourl" "$repodir}"
     }
 }
+
 # 
 # Prepare the 
 # 
