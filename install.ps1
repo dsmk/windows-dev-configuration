@@ -5,7 +5,7 @@ param(
     [switch] $Elevated
 )
 if ($Verbose) {
-    Write-Output "# Options: Debug=$Debug Verbose=$Verbose"
+    Write-Output "# Options: Debug=$Debug Verbose=$Verbose Elevated=$Elevated"
 }
 
 # write-OUtput "Debug=$Debug"
@@ -142,6 +142,30 @@ function Add-Directory {
     }
 }
 
+function Add-GitCloneDirectory {
+    param(
+        [string]$RepoUrl,
+        [string]$Directory
+    )
+
+    if (Test-Path -Path $Directory) {
+        if (Test-Path -Path "${Directory}\.git") {
+            if ($Verbose) {
+                Write-Output "Add-GitCloneDirectory($RepoUrl): $Directory already a git clone"
+            }
+        } else {
+            Write-Output "Add-GitCloneDirectory($RepoUrl): $Directory exists but not a git clone"
+        }
+    } else {
+        if ($Debug)  {
+            Write-Output "Add-GitCloneDirectory($RepoUrl): WOULD clone to $Directory"
+        } else {
+            Write-Output "Add-GitCloneDirectory($RepoUrl): cloning to $Directory"
+            git clone "$RepoUrl" "$Directory"
+        }
+    }
+}
+
 Add-ChocolateyPackage "awscli"
 # Add-ChocolateyPackage "liquidtext"
 
@@ -155,25 +179,30 @@ Set-WindowsOptionalFeature Microsoft-Windows-Subsystem-Linux
 #
 # Now we go through the directories we need to make certain exist
 #
-Add-Directory "${env:USERPROFILE}\Documents\projects"
+# projects directory
+$projdir = "${env:USERPROFILE}\Documents\projects"
 
+Add-Directory "${projdir}"
+# 2022 iam projects
+Add-GitCloneDirectory "https://github.com/bu-ist/iam-DirectoryModernization-SourceDB.git" "${projdir}\iam-DirectoryModernization-SourceDB"
 # 
 # Clone a copy of configuration repo if not already done
 #
-$repourl = "https://github.com/dsmk/windows-dev-configuration.git"
-$repodir = "${env:USERPROFILE}\windows-dev-configuration"
-if (Test-Path -Path $repodir) {
-    if ($Verbose) {
-        Write-Output "Configuration-Repo: ${repodir} already exists"
-    }
-} else {
-    if ($Debug) {
-        Write-Output "Configuration-Repo: WOULD clone ${repourl} to ${repodir}"
-    } else {
-        write-Output "Configuration-Repo: cloning ${repourl} to ${repodir}"
-        git clone "$repourl" "$repodir"
-    }
-}
+Add-GitCloneDirectory "https://github.com/dsmk/windows-dev-configuration.git" "${env:USERPROFILE}\windows-dev-configuration"
+# $repourl = "https://github.com/dsmk/windows-dev-configuration.git"
+# $repodir = "${env:USERPROFILE}\windows-dev-configuration"
+# if (Test-Path -Path $repodir) {
+#     if ($Verbose) {
+#         Write-Output "Configuration-Repo: ${repodir} already exists"
+#     }
+# } else {
+#     if ($Debug) {
+#         Write-Output "Configuration-Repo: WOULD clone ${repourl} to ${repodir}"
+#     } else {
+#         write-Output "Configuration-Repo: cloning ${repourl} to ${repodir}"
+#         git clone "$repourl" "$repodir"
+#     }
+# }
 
 # 
 # Prepare the 
