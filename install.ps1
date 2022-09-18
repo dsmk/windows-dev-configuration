@@ -1,23 +1,27 @@
 # 
 param(
-    [switch] $Debug
+    [switch] $Debug,
+    [switch] $Verbose
 )
+if ($Verbose) {
+    Write-Output "# Options: Debug=$Debug Verbose=$Verbose"
+}
 # write-OUtput "Debug=$Debug"
 
-$AppListUrl = "https://raw.githubusercontent.com/dsmk/windows-dev-configuration/main/winget-app.json"
-
+# This should only be part of the bootstrap (unless we switch it to Chocolatey)
 # Download the winget app list to a temporary file
-$AppList = New-TemporaryFile
-Invoke-WebRequest -Uri $AppListUrl -OutFile $AppList
+# $AppListUrl = "https://raw.githubusercontent.com/dsmk/windows-dev-configuration/main/winget-app.json"
+# $AppList = New-TemporaryFile
+# Invoke-WebRequest -Uri $AppListUrl -OutFile $AppList
 
-Write-Output "Filename is $AppList"
+# Write-Output "Filename is $AppList"
 
-# Now make certain that all the packages have been gotten
-if ($Debug) {
-    Write-Output "WOULD execute winget import"
-} else {
-    winget import -i "$AppList"
-}
+# # Now make certain that all the packages have been gotten
+# if ($Debug) {
+#     Write-Output "WOULD execute winget import"
+# } else {
+#     winget import -i "$AppList"
+# }
 
 # 
 # Make certain that the git config is set properly
@@ -33,7 +37,9 @@ function Set-GitGlobalConfig {
 
     Write-Debug "${ConfigOption}: current=(${CurrentValue}) desired=(${ConfigValue})"
     if ($CurrentValue -eq $ConfigValue) {
-        Write-Output "Set-GitGlobalConfig(${ConfigOption}): Value already set to ${ConfigValue}"
+        if ($Verbose) {
+            Write-Output "Set-GitGlobalConfig(${ConfigOption}): Value already set to ${ConfigValue}"
+        }
     } else {
         if ($Debug) {
             Write-Output "Set-GitGlobalConfig(${ConfigOption}): WOULD set value to ${ConfigValue}"
@@ -49,14 +55,15 @@ function Set-WindowsOptionalFeature {
     )
 
     $state = Get-WindowsOptionalFeature -Online -FeatureName $Feature | ForEach-Object State
-    Write-Output "test=$state"
     if ($state -eq "Disabled") {
         if ($Debug) {
-            write-Output "${Feature} enable"
+            write-Output "Set-WindowsOptionalFeature(${Feature}): WOULD enable feature"
         } else {
-            Write-Output "${$Feature} enabling feature"
+            Write-Output "Set-WindowsOptionalFeature(${$Feature}): enabling feature"
             Enable-WindowsOptionalFeature -Online -FeatureName $Feature
         }
+    } elseif ($Verbose) {
+        write-Output "Set-WindowsOptionalFeature($Feature): feature already enabled"
     }
 }
 
@@ -72,13 +79,15 @@ Set-WindowsOptionalFeature Microsoft-Windows-Subsystem-Linux
 $repourl = "https://github.com/dsmk/windows-dev-configuration.git"
 $repodir = "${env:USERPROFILE}\windows-dev-configuration"
 if (Test-Path -Path $repodir) {
-    Write-Output "${repodir} already exists"
+    if ($Verbose) {
+        Write-Output "Configuration-Repo: ${repodir} already exists"
+    }
 } else {
     if ($Debug) {
-        Write-Output "${repodir}: Would clone the repo"
+        Write-Output "Configuration-Repo: WOULD clone ${repourl} to ${repodir}"
     } else {
-        write-Output "${repodir}: Clone configuration repo to location"
-        git clone "$repourl" "$repodir}"
+        write-Output "Configuration-Repo: cloning ${repourl} to ${repodir}"
+        git clone "$repourl" "$repodir"
     }
 }
 
