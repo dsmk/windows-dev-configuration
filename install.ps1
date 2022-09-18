@@ -47,9 +47,9 @@ function Set-WindowsOptionalFeature {
     param (
         [string]$Feature
     )
-    #Write-Output "test"
-    $state = Get-WindowsOptionalFeature -Online -FeatureName $Feature | % State
-    #Write-Output "test=$state"
+
+    $state = Get-WindowsOptionalFeature -Online -FeatureName $Feature | ForEach-Object State
+    Write-Output "test=$state"
     if ($state -eq "Disabled") {
         if ($Debug) {
             write-Output "${Feature} enable"
