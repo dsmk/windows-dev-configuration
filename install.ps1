@@ -46,6 +46,24 @@ function Set-GitGlobalConfig {
 
 Set-GitGlobalConfig "user.email" "dsmk@bu.edu"
 Set-GitGlobalConfig "user.name" "David King"
+
+# 
+# Clone a copy of configuration repo if not already done
+#
+$repourl = "https://github.com/dsmk/windows-dev-configuration.git"
+$repodir = "${env:USERPROFILE}\windows-dev-configuration"
+if (Test-Path -Path $repodir) {
+    Write-Output "${repodir} already exists"
+} else {
+    if ($Debug) {
+        Write-Output "${repodir}: Would clone the repo"
+    } else {
+        write-Output "${repodir}: Clone configuration repo to location"
+        git clone "$repourl" "$repodir}"
+    }
+}
+# 
+# Prepare the 
 # 
 # Configuration EnvironmentVariable_Path
 # {
