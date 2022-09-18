@@ -1,11 +1,13 @@
 # 
 param(
     [switch] $Debug,
-    [switch] $Verbose
+    [switch] $Verbose,
+    [switch] $Elevated
 )
 if ($Verbose) {
     Write-Output "# Options: Debug=$Debug Verbose=$Verbose"
 }
+
 # write-OUtput "Debug=$Debug"
 
 # This should only be part of the bootstrap (unless we switch it to Chocolatey)
@@ -54,6 +56,11 @@ function Set-WindowsOptionalFeature {
         [string]$Feature
     )
 
+    if (-not $Elevated) {
+        Write-Output "Set-WindowsOptionalFeature(${Feature}): bypassing as PowerShell is not elevated"
+        return
+    }
+
     $state = Get-WindowsOptionalFeature -Online -FeatureName $Feature | ForEach-Object State
     if ($state -eq "Disabled") {
         if ($Debug) {
@@ -67,11 +74,88 @@ function Set-WindowsOptionalFeature {
     }
 }
 
+# We store a global variable for the packages
+$ChocolateyPackages = @{}
+
+function Get-ChocolateyPackages {
+    # use variable to determine if Chocolatey is already installed
+    if (-not $env:ChocolateyInstall) {
+        Write-Error "Get-ChocolateyPackages: chocolatey has not been installed"
+        return $ChocolateyPackages
+    }
+
+    if ($ChocolateyPackages.Count -eq 0) {
+        $choco_output = chocolatey list -l
+
+        foreach ($line in $choco_output) {
+            $name, $ver = $line.split(' ')
+            # Write-Output "#### name=$name ver=$ver line=$line\n"
+            $ChocolateyPackages[$name] = $ver
+        }
+    }
+    return $ChocolateyPackages
+}
+
+function Add-ChocolateyPackage {
+    param (
+        [string]$Package
+    )
+    # Get the chocolatey packages
+    $packages = Get-ChocolateyPackages
+
+    if ($Verbose) {
+        Write-Output "Add-ChocolateyPackage($Package): version=$packages[$Package]"
+    }
+
+    if ($packages.Count -eq 0) {
+        Write-Output "Add-ChocolateyPackage($Package): chocolatey is not yet installed"
+    } elseif ($packages[$Package]) {
+        if ($Verbose) {
+            Write-Output "Add-ChocolateyPackage($Package): package already exists and version=${packages[$Package]}"
+        } 
+    } else {
+        if ($Debug) {
+            Write-Output "Add-ChocolateyPackage($Package): WOULD install package"
+        } else {
+            Write-Output "Add-ChocolateyPackage($Package): installing package"
+            choco install "$Package"
+        }
+    }
+}
+
+function Add-Directory {
+    param (
+        [string]$Directory
+    )
+
+    if (Test-Path -Path $Directory) {
+        if ($Verbose) {
+            Write-Output "Add-Directory($Directory): already exists"
+        } 
+    } else {
+        if ($Debug) {
+            Write-Output "Add-Directory($Directory): WOULD create directory"
+        } else {
+            Write-Output "Add-Directory($Directory): creating directory"
+            New-Item -itemtype directory -path "$Directory"
+        }
+    }
+}
+
+Add-ChocolateyPackage "awscli"
+# Add-ChocolateyPackage "liquidtext"
+
 Set-GitGlobalConfig "user.email" "dsmk@bu.edu"
 Set-GitGlobalConfig "user.name" "David King"
 
 Set-WindowsOptionalFeature VirtualMachinePlatform
 Set-WindowsOptionalFeature Microsoft-Windows-Subsystem-Linux
+
+# Get-ChildItem env:
+#
+# Now we go through the directories we need to make certain exist
+#
+Add-Directory "${env:USERPROFILE}\Documents\projects"
 
 # 
 # Clone a copy of configuration repo if not already done
