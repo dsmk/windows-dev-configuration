@@ -23,7 +23,7 @@ $AppListFile = "win11.json"
 if ($Debug) {
     Write-Output "WOULD execute winget import"
 } else {
-    winget import -i "$AppListFile"
+    # winget import -i "$AppListFile"
 }
 # This should only be part of the bootstrap (unless we switch it to Chocolatey)
 # Download the winget app list to a temporary file
@@ -96,12 +96,12 @@ function Get-ChocolateyPackages {
     if (-not $env:ChocolateyInstall) {
         # Write-Error "Get-ChocolateyPackages: chocolatey has not been installed"
         # return $ChocolateyPackages
-        if (!$Elevated) {
+        if ($Elevated) {
             $execpolicy = get-executionpolicy
             Write-Error "Get-ChocolateyPackages: installing chocolatey"
             Set-ExecutionPolicy Bypass -Scope Process -Force 
             [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072 
-            iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+            Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
             set-executionpolicy $execpolicy -scope Process
             
         } else {
