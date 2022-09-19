@@ -166,6 +166,27 @@ function Add-GitCloneDirectory {
     }
 }
 
+function Set-UserEnvironmentVariable {
+    param(
+        [string]$Key,
+        [string]$Value
+    )
+
+    $current = [Environment]::GetEnvironmentVariable($Key, 'User')
+    if ($current -eq $Value) {
+        if ($Verbose) {
+            Write-Output "Set-UserEnvironmentVariable($Key): already set to $Value"
+        }
+    } else {
+        if ($Debug) {
+            Write-Output "Set-UserEnvironmentVariable($Key): WOULD set to $Value"
+        } else {
+            Write-Output "Set-UserEnvironmentVariable($Key): setting to $Value"
+            [Environment]::SetEnvironmentVariable($Key, $Value, "User")
+        }
+    }
+}
+
 Add-ChocolateyPackage "awscli"
 # Add-ChocolateyPackage "liquidtext"
 
@@ -182,6 +203,7 @@ Set-WindowsOptionalFeature Microsoft-Windows-Subsystem-Linux
 # projects directory
 $projdir = "${env:USERPROFILE}\Documents\projects"
 
+Set-UserEnvironmentVariable "Proj" "${projdir}"
 Add-Directory "${projdir}"
 # 2022 iam projects
 Add-GitCloneDirectory "https://github.com/bu-ist/iam-DirectoryModernization-SourceDB.git" "${projdir}\iam-DirectoryModernization-SourceDB"
