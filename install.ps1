@@ -10,6 +10,21 @@ if ($Verbose) {
 
 # write-OUtput "Debug=$Debug"
 
+$AppListFile = "win11.json"
+
+
+# Download the winget app list to a temporary file
+#$AppList = New-TemporaryFile
+#Invoke-WebRequest -Uri $AppListUrl -OutFile $AppList
+
+#Write-Output "Filename is $AppList"
+
+# Now make certain that all the packages have been gotten
+if ($Debug) {
+    Write-Output "WOULD execute winget import"
+} else {
+    winget import -i "$AppListFile"
+}
 # This should only be part of the bootstrap (unless we switch it to Chocolatey)
 # Download the winget app list to a temporary file
 # $AppListUrl = "https://raw.githubusercontent.com/dsmk/windows-dev-configuration/main/winget-app.json"
@@ -24,7 +39,6 @@ if ($Verbose) {
 # } else {
 #     winget import -i "$AppList"
 # }
-
 # 
 # Make certain that the git config is set properly
 #
