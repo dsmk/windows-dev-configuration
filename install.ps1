@@ -1,7 +1,13 @@
 # 
 param(
-    [switch] $Debug
+    [switch] $Debug,
+    [switch] $Verbose,
+    [switch] $Elevated
 )
+if ($Verbose) {
+    Write-Output "# Options: Debug=$Debug Verbose=$Verbose Elevated=$Elevated"
+}
+
 # write-OUtput "Debug=$Debug"
 
 $AppListFile = "win11.json"
@@ -19,7 +25,20 @@ if ($Debug) {
 } else {
     winget import -i "$AppListFile"
 }
+# This should only be part of the bootstrap (unless we switch it to Chocolatey)
+# Download the winget app list to a temporary file
+# $AppListUrl = "https://raw.githubusercontent.com/dsmk/windows-dev-configuration/main/winget-app.json"
+# $AppList = New-TemporaryFile
+# Invoke-WebRequest -Uri $AppListUrl -OutFile $AppList
 
+# Write-Output "Filename is $AppList"
+
+# # Now make certain that all the packages have been gotten
+# if ($Debug) {
+#     Write-Output "WOULD execute winget import"
+# } else {
+#     winget import -i "$AppList"
+# }
 # 
 # Make certain that the git config is set properly
 #
@@ -34,7 +53,9 @@ function Set-GitGlobalConfig {
 
     Write-Debug "${ConfigOption}: current=(${CurrentValue}) desired=(${ConfigValue})"
     if ($CurrentValue -eq $ConfigValue) {
-        Write-Output "Set-GitGlobalConfig(${ConfigOption}): Value already set to ${ConfigValue}"
+        if ($Verbose) {
+            Write-Output "Set-GitGlobalConfig(${ConfigOption}): Value already set to ${ConfigValue}"
+        }
     } else {
         if ($Debug) {
             Write-Output "Set-GitGlobalConfig(${ConfigOption}): WOULD set value to ${ConfigValue}"
@@ -48,18 +69,140 @@ function Set-WindowsOptionalFeature {
     param (
         [string]$Feature
     )
-    #Write-Output "test"
-    $state = Get-WindowsOptionalFeature -Online -FeatureName $Feature | % State
-    #Write-Output "test=$state"
+
+    if (-not $Elevated) {
+        Write-Output "Set-WindowsOptionalFeature(${Feature}): bypassing as PowerShell is not elevated"
+        return
+    }
+
+    $state = Get-WindowsOptionalFeature -Online -FeatureName $Feature | ForEach-Object State
     if ($state -eq "Disabled") {
         if ($Debug) {
-            write-Output "${Feature} enable"
+            write-Output "Set-WindowsOptionalFeature(${Feature}): WOULD enable feature"
         } else {
-            Write-Output "${$Feature} enabling feature"
+            Write-Output "Set-WindowsOptionalFeature(${$Feature}): enabling feature"
             Enable-WindowsOptionalFeature -Online -FeatureName $Feature
+        }
+    } elseif ($Verbose) {
+        write-Output "Set-WindowsOptionalFeature($Feature): feature already enabled"
+    }
+}
+
+# We store a global variable for the packages
+$ChocolateyPackages = @{}
+
+function Get-ChocolateyPackages {
+    # use variable to determine if Chocolatey is already installed
+    if (-not $env:ChocolateyInstall) {
+        Write-Error "Get-ChocolateyPackages: chocolatey has not been installed"
+        return $ChocolateyPackages
+    }
+
+    if ($ChocolateyPackages.Count -eq 0) {
+        $choco_output = chocolatey list -l
+
+        foreach ($line in $choco_output) {
+            $name, $ver = $line.split(' ')
+            # Write-Output "#### name=$name ver=$ver line=$line\n"
+            $ChocolateyPackages[$name] = $ver
+        }
+    }
+    return $ChocolateyPackages
+}
+
+function Add-ChocolateyPackage {
+    param (
+        [string]$Package
+    )
+    # Get the chocolatey packages
+    $packages = Get-ChocolateyPackages
+
+    if ($Verbose) {
+        Write-Output "Add-ChocolateyPackage($Package): version=$packages[$Package]"
+    }
+
+    if ($packages.Count -eq 0) {
+        Write-Output "Add-ChocolateyPackage($Package): chocolatey is not yet installed"
+    } elseif ($packages[$Package]) {
+        if ($Verbose) {
+            Write-Output "Add-ChocolateyPackage($Package): package already exists and version=${packages[$Package]}"
+        } 
+    } else {
+        if ($Debug) {
+            Write-Output "Add-ChocolateyPackage($Package): WOULD install package"
+        } else {
+            Write-Output "Add-ChocolateyPackage($Package): installing package"
+            choco install "$Package"
         }
     }
 }
+
+function Add-Directory {
+    param (
+        [string]$Directory
+    )
+
+    if (Test-Path -Path $Directory) {
+        if ($Verbose) {
+            Write-Output "Add-Directory($Directory): already exists"
+        } 
+    } else {
+        if ($Debug) {
+            Write-Output "Add-Directory($Directory): WOULD create directory"
+        } else {
+            Write-Output "Add-Directory($Directory): creating directory"
+            New-Item -itemtype directory -path "$Directory"
+        }
+    }
+}
+
+function Add-GitCloneDirectory {
+    param(
+        [string]$RepoUrl,
+        [string]$Directory
+    )
+
+    if (Test-Path -Path $Directory) {
+        if (Test-Path -Path "${Directory}\.git") {
+            if ($Verbose) {
+                Write-Output "Add-GitCloneDirectory($RepoUrl): $Directory already a git clone"
+            }
+        } else {
+            Write-Output "Add-GitCloneDirectory($RepoUrl): $Directory exists but not a git clone"
+        }
+    } else {
+        if ($Debug)  {
+            Write-Output "Add-GitCloneDirectory($RepoUrl): WOULD clone to $Directory"
+        } else {
+            Write-Output "Add-GitCloneDirectory($RepoUrl): cloning to $Directory"
+            git clone "$RepoUrl" "$Directory"
+        }
+    }
+}
+
+function Set-UserEnvironmentVariable {
+    param(
+        [string]$Key,
+        [string]$Value
+    )
+
+    $current = [Environment]::GetEnvironmentVariable($Key, 'User')
+    if ($current -eq $Value) {
+        if ($Verbose) {
+            Write-Output "Set-UserEnvironmentVariable($Key): already set to $Value"
+        }
+    } else {
+        if ($Debug) {
+            Write-Output "Set-UserEnvironmentVariable($Key): WOULD set to $Value"
+        } else {
+            Write-Output "Set-UserEnvironmentVariable($Key): setting to $Value"
+            [Environment]::SetEnvironmentVariable($Key, $Value, "User")
+        }
+    }
+}
+
+Add-ChocolateyPackage "awscli"
+# Add-ChocolateyPackage "liquidtext"
 
 Set-GitGlobalConfig "user.email" "dsmk@bu.edu"
 Set-GitGlobalConfig "user.name" "David King"
@@ -67,21 +210,35 @@ Set-GitGlobalConfig "user.name" "David King"
 Set-WindowsOptionalFeature VirtualMachinePlatform
 Set-WindowsOptionalFeature Microsoft-Windows-Subsystem-Linux
 
+# Get-ChildItem env:
+#
+# Now we go through the directories we need to make certain exist
+#
+# projects directory
+$projdir = "${env:USERPROFILE}\Documents\projects"
+
+Set-UserEnvironmentVariable "Proj" "${projdir}"
+Add-Directory "${projdir}"
+# 2022 iam projects
+Add-GitCloneDirectory "https://github.com/bu-ist/iam-DirectoryModernization-SourceDB.git" "${projdir}\iam-DirectoryModernization-SourceDB"
 # 
 # Clone a copy of configuration repo if not already done
 #
-$repourl = "https://github.com/dsmk/windows-dev-configuration.git"
-$repodir = "${env:USERPROFILE}\windows-dev-configuration"
-if (Test-Path -Path $repodir) {
-    Write-Output "${repodir} already exists"
-} else {
-    if ($Debug) {
-        Write-Output "${repodir}: Would clone the repo"
-    } else {
-        write-Output "${repodir}: Clone configuration repo to location"
-        git clone "$repourl" "$repodir}"
-    }
-}
+Add-GitCloneDirectory "https://github.com/dsmk/windows-dev-configuration.git" "${env:USERPROFILE}\windows-dev-configuration"
+# $repourl = "https://github.com/dsmk/windows-dev-configuration.git"
+# $repodir = "${env:USERPROFILE}\windows-dev-configuration"
+# if (Test-Path -Path $repodir) {
+#     if ($Verbose) {
+#         Write-Output "Configuration-Repo: ${repodir} already exists"
+#     }
+# } else {
+#     if ($Debug) {
+#         Write-Output "Configuration-Repo: WOULD clone ${repourl} to ${repodir}"
+#     } else {
+#         write-Output "Configuration-Repo: cloning ${repourl} to ${repodir}"
+#         git clone "$repourl" "$repodir"
+#     }
+# }
 
 # 
 # Prepare the 
