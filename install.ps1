@@ -4,19 +4,20 @@ param(
 )
 # write-OUtput "Debug=$Debug"
 
-$AppListUrl = "https://raw.githubusercontent.com/dsmk/windows-dev-configuration/main/winget-app.json"
+$AppListFile = "win11.json"
+
 
 # Download the winget app list to a temporary file
-$AppList = New-TemporaryFile
-Invoke-WebRequest -Uri $AppListUrl -OutFile $AppList
+#$AppList = New-TemporaryFile
+#Invoke-WebRequest -Uri $AppListUrl -OutFile $AppList
 
-Write-Output "Filename is $AppList"
+#Write-Output "Filename is $AppList"
 
 # Now make certain that all the packages have been gotten
 if ($Debug) {
     Write-Output "WOULD execute winget import"
 } else {
-    winget import -i "$AppList"
+    winget import -i "$AppListFile"
 }
 
 # 
