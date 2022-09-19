@@ -4,8 +4,14 @@ param(
     [switch] $Verbose,
     [switch] $Elevated
 )
+
+# Load configuration from a hosts file
+$config = Get-Content ".\hosts\remus.json" | ConvertFrom-Json
+
 if ($Verbose) {
     Write-Output "# Options: Debug=$Debug Verbose=$Verbose Elevated=$Elevated"
+    Write-Output "# Packages: ${config.packages}"
+    Write-Output "# Gitconfig: ${config.gitconfig}"
 }
 
 # write-OUtput "Debug=$Debug"
@@ -166,11 +172,18 @@ function Add-GitCloneDirectory {
     }
 }
 
-Add-ChocolateyPackage "awscli"
+foreach ($package in $config.packages) {
+    #Write-Output "pkg=$package"
+    Add-ChocolateyPackage $package
+}
 # Add-ChocolateyPackage "liquidtext"
 
-Set-GitGlobalConfig "user.email" "dsmk@bu.edu"
-Set-GitGlobalConfig "user.name" "David King"
+Write-Output "keys=${config.gitconfig}"
+foreach ($git in $config.gitconfig.keys) {
+    Set-GitGlobalConfig $git $config.gitconfig[$git]
+}
+# Set-GitGlobalConfig "user.email" "dsmk@bu.edu"
+# Set-GitGlobalConfig "user.name" "David King"
 
 Set-WindowsOptionalFeature VirtualMachinePlatform
 Set-WindowsOptionalFeature Microsoft-Windows-Subsystem-Linux

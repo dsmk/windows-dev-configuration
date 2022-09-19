@@ -1,0 +1,17 @@
+{
+    "packages": [
+        "awscli",
+        "liquidtext"
+    ],
+    "gitconfig": {
+        "user.email": "dsmk@bu.edu",
+        "user.name": "David King"
+    },
+    "optionalfeatures": {
+        "VirtualMachinePlatform": "yes",
+        "Microsoft-Windows-Subsystem-Linux": "yes"
+    },
+    "projects": {
+        "iam-DirectoryModernization-SourceDB": "https://github.com/bu-ist/iam-DirectoryModernization-SourceDB.git"
+    }
+}
