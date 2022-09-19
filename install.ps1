@@ -80,8 +80,20 @@ $ChocolateyPackages = @{}
 function Get-ChocolateyPackages {
     # use variable to determine if Chocolatey is already installed
     if (-not $env:ChocolateyInstall) {
-        Write-Error "Get-ChocolateyPackages: chocolatey has not been installed"
-        return $ChocolateyPackages
+        # Write-Error "Get-ChocolateyPackages: chocolatey has not been installed"
+        # return $ChocolateyPackages
+        if (!$Elevated) {
+            $execpolicy = get-executionpolicy
+            Write-Error "Get-ChocolateyPackages: installing chocolatey"
+            Set-ExecutionPolicy Bypass -Scope Process -Force 
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072 
+            iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+            set-executionpolicy $execpolicy -scope Process
+            
+        } else {
+            Write-Error "Get-ChocolateyPackages: chocolatey not installed - run in admin shell with -Elevated to install"
+            return $ChocolateyPackages
+        }
     }
 
     if ($ChocolateyPackages.Count -eq 0) {
