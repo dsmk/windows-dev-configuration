@@ -2,11 +2,18 @@
 param(
     [switch] $Debug,
     [switch] $Verbose,
-    [switch] $Elevated
+    [switch] $Elevated,
+    [string] $ComputerName = $env:COMPUTERNAME
 )
 
 # Load configuration from a hosts file
-$config = Get-Content ".\hosts\remus.json" | ConvertFrom-Json
+$jsonname = ".\hosts\${ComputerName}.json"
+if (Test-Path -Path $jsonname) {
+    $config = Get-Content $jsonname | ConvertFrom-Json
+} else {
+    Write-Output "Config ${jsonname} not found; use -ComputerName to set alternate name"
+    exit
+}
 
 if ($Verbose) {
     Write-Output "# Options: Debug=$Debug Verbose=$Verbose Elevated=$Elevated"
@@ -16,6 +23,21 @@ if ($Verbose) {
 
 # write-OUtput "Debug=$Debug"
 
+$AppListFile = "win11.json"
+
+
+# Download the winget app list to a temporary file
+#$AppList = New-TemporaryFile
+#Invoke-WebRequest -Uri $AppListUrl -OutFile $AppList
+
+#Write-Output "Filename is $AppList"
+
+# Now make certain that all the packages have been gotten
+if ($Debug) {
+    Write-Output "WOULD execute winget import"
+} else {
+    # winget import -i "$AppListFile"
+}
 # This should only be part of the bootstrap (unless we switch it to Chocolatey)
 # Download the winget app list to a temporary file
 # $AppListUrl = "https://raw.githubusercontent.com/dsmk/windows-dev-configuration/main/winget-app.json"
@@ -30,7 +52,6 @@ if ($Verbose) {
 # } else {
 #     winget import -i "$AppList"
 # }
-
 # 
 # Make certain that the git config is set properly
 #
@@ -86,8 +107,20 @@ $ChocolateyPackages = @{}
 function Get-ChocolateyPackages {
     # use variable to determine if Chocolatey is already installed
     if (-not $env:ChocolateyInstall) {
-        Write-Error "Get-ChocolateyPackages: chocolatey has not been installed"
-        return $ChocolateyPackages
+        # Write-Error "Get-ChocolateyPackages: chocolatey has not been installed"
+        # return $ChocolateyPackages
+        if ($Elevated) {
+            $execpolicy = get-executionpolicy
+            Write-Error "Get-ChocolateyPackages: installing chocolatey"
+            Set-ExecutionPolicy Bypass -Scope Process -Force 
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072 
+            Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+            set-executionpolicy $execpolicy -scope Process
+            
+        } else {
+            Write-Error "Get-ChocolateyPackages: chocolatey not installed - run in admin shell with -Elevated to install"
+            return $ChocolateyPackages
+        }
     }
 
     if ($ChocolateyPackages.Count -eq 0) {
@@ -171,22 +204,45 @@ function Add-GitCloneDirectory {
         }
     }
 }
+function Set-UserEnvironmentVariable {
+    param(
+        [string]$Key,
+        [string]$Value
+    )
+
+    $current = [Environment]::GetEnvironmentVariable($Key, 'User')
+    if ($current -eq $Value) {
+        if ($Verbose) {
+            Write-Output "Set-UserEnvironmentVariable($Key): already set to $Value"
+        }
+    } else {
+        if ($Debug) {
+            Write-Output "Set-UserEnvironmentVariable($Key): WOULD set to $Value"
+        } else {
+            Write-Output "Set-UserEnvironmentVariable($Key): setting to $Value"
+            [Environment]::SetEnvironmentVariable($Key, $Value, "User")
+        }
+    }
+}
 
 foreach ($package in $config.packages) {
     #Write-Output "pkg=$package"
     Add-ChocolateyPackage $package
 }
+# Add-ChocolateyPackage "awscli"
 # Add-ChocolateyPackage "liquidtext"
 
-Write-Output "keys=${config.gitconfig}"
-foreach ($git in $config.gitconfig.keys) {
-    Set-GitGlobalConfig $git $config.gitconfig[$git]
+foreach ($git in $config.gitconfig) {
+    Set-GitGlobalConfig $git.option $git.value
 }
 # Set-GitGlobalConfig "user.email" "dsmk@bu.edu"
 # Set-GitGlobalConfig "user.name" "David King"
 
-Set-WindowsOptionalFeature VirtualMachinePlatform
-Set-WindowsOptionalFeature Microsoft-Windows-Subsystem-Linux
+foreach ($feature in $config.optionalfeatures) {
+    Set-WindowsOptionalFeature "$feature"
+}
+# Set-WindowsOptionalFeature VirtualMachinePlatform
+# Set-WindowsOptionalFeature Microsoft-Windows-Subsystem-Linux
 
 # Get-ChildItem env:
 #
@@ -195,9 +251,14 @@ Set-WindowsOptionalFeature Microsoft-Windows-Subsystem-Linux
 # projects directory
 $projdir = "${env:USERPROFILE}\Documents\projects"
 
+Set-UserEnvironmentVariable "Proj" "${projdir}"
 Add-Directory "${projdir}"
+foreach ($project in $config.projects) {
+    $path = Join-Path -Path $projdir $project.name
+    Add-GitCloneDirectory $project.url $path
+}
 # 2022 iam projects
-Add-GitCloneDirectory "https://github.com/bu-ist/iam-DirectoryModernization-SourceDB.git" "${projdir}\iam-DirectoryModernization-SourceDB"
+#Add-GitCloneDirectory "https://github.com/bu-ist/iam-DirectoryModernization-SourceDB.git" "${projdir}\iam-DirectoryModernization-SourceDB"
 # 
 # Clone a copy of configuration repo if not already done
 #

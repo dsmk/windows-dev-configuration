@@ -1,0 +1,33 @@
+{
+    "packages": [
+        "awscli",
+        "discord",
+        "docker-desktop",
+        "git",
+        "GoogleChrome",
+        "microsoft-windows-terminal",
+        "nodejs",
+        "python3",
+        "slack",
+        "terraform",
+        "vagrant",
+        "vscode",
+        "vscode-ansible",
+        "vscode-docker",
+        "vscode-gitlens",
+        "wsl"
+    ],
+    "gitconfig": [
+        { "option": "user.email", "value": "dsmk@bu.edu" },
+        { "option": "user.name", "value": "David King" }
+    ],
+    "optionalfeatures": [
+        "Microsoft-Hyper-V",
+        "Microsoft-Hyper-V-Management-PowerShell",
+        "Microsoft-Windows-Subsystem-Linux",
+        "VirtualMachinePlatform"
+    ],
+    "projects": [
+        { "name": "iam-DirectoryModernization-SourceDB", "url": "https://github.com/bu-ist/iam-DirectoryModernization-SourceDB.git" }
+    ]
+}
