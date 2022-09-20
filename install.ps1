@@ -116,7 +116,7 @@ function Get-ChocolateyPackages {
             [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072 
             Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
             set-executionpolicy $execpolicy -scope Process
-            
+
         } else {
             Write-Error "Get-ChocolateyPackages: chocolatey not installed - run in admin shell with -Elevated to install"
             return $ChocolateyPackages
@@ -143,7 +143,7 @@ function Add-ChocolateyPackage {
     $packages = Get-ChocolateyPackages
 
     if ($Verbose) {
-        Write-Output "Add-ChocolateyPackage($Package): version=$packages[$Package]"
+        Write-Output "Add-ChocolateyPackage($Package): version=${packages[$Package].toString}"
     }
 
     if ($packages.Count -eq 0) {
@@ -153,6 +153,12 @@ function Add-ChocolateyPackage {
             Write-Output "Add-ChocolateyPackage($Package): package already exists and version=${packages[$Package]}"
         } 
     } else {
+        # 
+        if (-not $Elevated) {
+            Write-Output "Add-ChocolateyPackage(${Package}): would install package if -Elevated is used"
+            return
+        }
+    
         if ($Debug) {
             Write-Output "Add-ChocolateyPackage($Package): WOULD install package"
         } else {
