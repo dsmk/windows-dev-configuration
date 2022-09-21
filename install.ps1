@@ -23,7 +23,7 @@ if ($Verbose) {
 
 # write-OUtput "Debug=$Debug"
 
-$AppListFile = "win11.json"
+#$AppListFile = "win11.json"
 
 
 # Download the winget app list to a temporary file
@@ -33,11 +33,11 @@ $AppListFile = "win11.json"
 #Write-Output "Filename is $AppList"
 
 # Now make certain that all the packages have been gotten
-if ($Debug) {
-    Write-Output "WOULD execute winget import"
-} else {
-    # winget import -i "$AppListFile"
-}
+# if ($Debug) {
+#     Write-Output "WOULD execute winget import"
+# } else {
+#     # winget import -i "$AppListFile"
+# }
 # This should only be part of the bootstrap (unless we switch it to Chocolatey)
 # Download the winget app list to a temporary file
 # $AppListUrl = "https://raw.githubusercontent.com/dsmk/windows-dev-configuration/main/winget-app.json"
@@ -168,6 +168,40 @@ function Add-ChocolateyPackage {
     }
 }
 
+function Add-WingetPackage {
+    param (
+        [string]$PackageId,
+        [string]$Label
+    )
+
+    # easy hack to determine if valid = 5 lines is found
+    $package = winget list --id $PackageId
+    $isPackageInstalled = $package.Length -eq 5
+
+    if ($Verbose) {
+        Write-Output "Add-WingetPackage($Label): id=${PackageId} isInstalled=$isPackageInstalled version=${package.Version}"
+    }
+
+    if ($isPackageInstalled) {
+        if ($Verbose) {
+            Write-Output "Add-WingetPackage($Label): package already exists and version=${packages[$Package]}"
+        } 
+    } else {
+        # 
+        # if (-not $Elevated) {
+        #     Write-Output "Add-ChocolateyPackage(${Package}): would install package if -Elevated is used"
+        #     return
+        # }
+    
+        if ($Debug) {
+            Write-Output "Add-WingetPackage($Label): WOULD install package"
+        } else {
+            Write-Output "Add-WingetPackage($Label): installing package"
+            winget install $PackageId
+        }
+    }
+}
+
 function Add-Directory {
     param (
         [string]$Directory
@@ -232,6 +266,11 @@ function Set-UserEnvironmentVariable {
 }
 
 foreach ($package in $config.packages) {
+    #Write-Output "pkg=$package"
+    Add-WingetPackage $package.id $package.label
+}
+
+foreach ($package in $config.chocolatey) {
     #Write-Output "pkg=$package"
     Add-ChocolateyPackage $package
 }

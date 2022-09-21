@@ -1,7 +1,11 @@
 {
+    "chocolatey": [
+        "awscli"
+    ],
     "packages": [
-        "awscli",
-        "liquidtext"
+        { "id": "GitHub.cli", "label": "GitHub.cli" },
+        { "id": "9N9Z9NSV47FL", "label": "Liquidtext" },
+        { "id": "XP99J3KP4XZ4VV", "label": "Microsoft Store Zoom App" }
     ],
     "gitconfig": [
         { "option": "user.email", "value": "dsmk@bu.edu" },
