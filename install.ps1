@@ -214,12 +214,39 @@ function Get-WSLDistributions {
     return $ret
 }
 
+function Enable-WSL {
+    # determine if we have the kernel module
+    # Windows Subsystem for Linux Update
+    $pkg = Get-Package "Windows Subsystem for Linux Update"
+    if ($pkg) {
+        if ($Verbose) {
+            Write-Output "Enable-WSL: already installed kernel"
+        }
+    } else {
+        if ($Debug) {
+            Write-Output "Enable-WSL: WOULD install WSL kernel"
+        } else {
+            Write-Output "Enable-WSL: installing WSL kernel package"
+            # download the installer
+            $url = "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi"
+            $systype = systeminfo | find "System Type"
+            if ($systype -match 'ARM64-based') {
+                $url = "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_arm64.msi"
+            }
+            Invoke-WebRequest -Uri $url -OutFile "./wsl_update.msi"
+            Start-Process ./wsl_update.msi -Wait
+            Remove-Item "./wsl_update.msi"
+        }
+    }
+}
+
 function Add-WSLDistribution {
     param (
         [string]$Name,
         [string]$Comment
     )
 
+    Enable-WSL
     $distros = Get-WSLDistributions
 
     if ($Verbose) {
