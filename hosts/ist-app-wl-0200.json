@@ -27,6 +27,9 @@
         "Microsoft-Windows-Subsystem-Linux",
         "VirtualMachinePlatform"
     ],
+    "wsl": [
+        { "name": "Ubuntu", "comment": "Latest stable Ubuntu" } 
+    ],
     "projects": [
         { "name": "iam-DirectoryModernization-SourceDB", "url": "https://github.com/bu-ist/iam-DirectoryModernization-SourceDB.git" }
     ]

@@ -202,6 +202,53 @@ function Add-WingetPackage {
     }
 }
 
+function Get-WSLDistributions {
+    $ret = @{}
+    $wsldistros = wsl --list
+    foreach ($line in $wsldistros) {
+        $name = [string]($line.Split(' '))[0]
+        if (! $ret[$name]) {
+            $ret.add($name, "yes")
+        }
+    }
+    return $ret
+}
+
+function Add-WSLDistribution {
+    param (
+        [string]$Name,
+        [string]$Comment
+    )
+
+    $distros = Get-WSLDistributions
+
+    if ($Verbose) {
+        Write-Output "Add-WSLDistribution($Name): comment=$Comment value=${distros[$Name]}"
+    }
+
+    if ($distros[$Name] -eq "yes") {
+        if ($Verbose) {
+            Write-Output "Add-WSLDistribution($Name): distribution already exists"
+        } 
+    } else {
+        # 
+        # if (-not $Elevated) {
+        #     Write-Output "Add-ChocolateyPackage(${Package}): would install package if -Elevated is used"
+        #     return
+        # }
+    
+        if ($Debug) {
+            Write-Output "Add-WSLDistribution($Name): WOULD install distribution"
+        } else {
+            Write-Output "Add-WSLDistribution($Name): installing distribution"
+            wsl --install --distribution "$Name"
+            # The following does not work since the install finishes before the installation is complete
+            # $windir = $env:USERPROFILE.Substring(2).Replace("\","/")
+            # wsl -d "$Name" -- ln -s "${windir}" win
+        }
+    }
+}
+
 function Add-Directory {
     param (
         [string]$Directory
@@ -288,6 +335,10 @@ foreach ($feature in $config.optionalfeatures) {
 }
 # Set-WindowsOptionalFeature VirtualMachinePlatform
 # Set-WindowsOptionalFeature Microsoft-Windows-Subsystem-Linux
+
+foreach ($distro in $config.wsl) {
+    Add-WSLDistribution $distro.name $distro.comment
+}
 
 # Get-ChildItem env:
 #
