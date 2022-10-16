@@ -3,9 +3,17 @@
         "awscli"
     ],
     "packages": [
+        { "id": "AgileBits.1Password", "label": "1Password" },
+        { "id": "com.amazon.venezia", "label": "Amazon AppStore" },
+        { "id": "Mozilla.firefox", "label": "Firefox browser" },
         { "id": "GitHub.cli", "label": "GitHub.cli" },
         { "id": "9N9Z9NSV47FL", "label": "Liquidtext" },
-        { "id": "XP99J3KP4XZ4VV", "label": "Microsoft Store Zoom App" }
+        { "id": "Microsoft.Edge", "label": "Microsoft Edge Browser" },
+        { "id": "Microsoft.OneDrive", "label": "Microsoft OneDrive" },
+        { "id": "XP99J3KP4XZ4VV", "label": "Microsoft Store Zoom App" },
+        { "id": "Microsoft.VisualStudioCode", "label": "Visual Studio Code" },
+        { "id": "Ookla.Speedtest", "label": "Speedtest by Ookla"},
+        { "id": "Valve.Steam", "label": "Steam Game Store" }
     ],
     "gitconfig": [
         { "option": "user.email", "value": "dsmk@bu.edu" },
@@ -19,6 +27,7 @@
         { "name": "Ubuntu", "comment": "Latest stable Ubuntu" } 
     ],
     "projects": [
-        { "name": "iam-DirectoryModernization-SourceDB", "url": "https://github.com/bu-ist/iam-DirectoryModernization-SourceDB.git" }
+        { "name": "iam-DirectoryModernization-SourceDB", "url": "https://github.com/bu-ist/iam-DirectoryModernization-SourceDB.git" },
+        { "name": "MagiskOnWSALocal", "url": "https://github.com/LSPosed/MagiskOnWSALocal.git" }
     ]
 }
