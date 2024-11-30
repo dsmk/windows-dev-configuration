@@ -175,8 +175,8 @@ function Add-WingetPackage {
     )
 
     # easy hack to determine if valid = 5 lines is found
-    $package = winget list --exact --id $PackageId
-    $isPackageInstalled = $package.Length -eq 5
+    $package = winget list --exact --id $PackageId | select-string "$PackageId"
+    $isPackageInstalled = $package
 
     if ($Verbose) {
         Write-Output "Add-WingetPackage($Label): id=${PackageId} isInstalled=$isPackageInstalled version=${package.Version}"
