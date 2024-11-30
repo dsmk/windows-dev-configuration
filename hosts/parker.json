@@ -1,0 +1,29 @@
+{
+    "chocolatey": [
+        "awscli"
+    ],
+    "packages": [
+        { "id": "XP99C9G0KRDZ27", "label": "1password"},
+        { "id": "Mozilla.Firefox", "label": "Firefox browser" },
+        { "id": "Git.Git", "label": "Git for Windows" },
+        { "id": "GitHub.cli", "label": "GitHub.cli" },
+	{ "id": "Google.Chrome", "label": "Google Chrome" },
+        { "id": "9N9Z9NSV47FL", "label": "Liquidtext" },
+        { "id": "Microsoft.OneDrive", "label": "Microsoft OneDrive" },
+        { "id": "XP99J3KP4XZ4VV", "label": "Microsoft Store Zoom App" },
+        { "id": "Microsoft.VisualStudioCode", "label": "Visual Studio Code" }
+    ],
+    "gitconfig": [
+        { "option": "user.email", "value": "dsmk@bu.edu" },
+        { "option": "user.name", "value": "David King" }
+    ],
+    "optionalfeatures": [
+        "VirtualMachinePlatform"
+    ],
+    "wsl": [
+        { "name": "Ubuntu", "comment": "Latest stable Ubuntu" } 
+    ],
+    "projects": [
+        { "name": "MagiskOnWSALocal", "url": "https://github.com/LSPosed/MagiskOnWSALocal.git" }
+    ]
+}
