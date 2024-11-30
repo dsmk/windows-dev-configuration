@@ -24,6 +24,11 @@
         { "name": "Ubuntu", "comment": "Latest stable Ubuntu" } 
     ],
     "projects": [
+        { "name": "aws-reinvent-2024", "url": "https://github.com/dsmk/aws-reinvent-2024.git" },
+        { "name": "buaws-istcloud-information", "url": "https://github.com/bu-ist/buaws-istcloud-information.git" },
+        { "name": "buaws-istcloud-infrastructure", "url": "https://github.com/bu-ist/buaws-istcloud-infrastructure.git" },
+        { "name": "ansible-rexden", "url": "https://github.com/dsmk/ansible-rexden.git" },
+        { "name": "rexden-cloud-infrastructure", "url": "https://github.com/dsmk/rexden-cloud-infrastructure.git" },
         { "name": "MagiskOnWSALocal", "url": "https://github.com/LSPosed/MagiskOnWSALocal.git" }
     ]
 }
