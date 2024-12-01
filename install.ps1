@@ -111,23 +111,24 @@ function Get-ChocolateyPackages {
         # return $ChocolateyPackages
         if ($Elevated) {
             $execpolicy = get-executionpolicy
-            Write-Error "Get-ChocolateyPackages: installing chocolatey"
+            # Write-Error "Get-ChocolateyPackages: installing chocolatey"
             Set-ExecutionPolicy Bypass -Scope Process -Force 
             [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072 
             Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
             set-executionpolicy $execpolicy -scope Process
 
         } else {
-            Write-Error "Get-ChocolateyPackages: chocolatey not installed - run in admin shell with -Elevated to install"
+            # Write-Error "Get-ChocolateyPackages: chocolatey not installed - run in admin shell with -Elevated to install"
             return $ChocolateyPackages
         }
     }
 
+    # Write-Output "packages($ChocolateyPackages.Count): $ChocolateyPackages"
     if ($ChocolateyPackages.Count -eq 0) {
-        $choco_output = chocolatey list -l
+        $choco_output = choco list -r 
 
         foreach ($line in $choco_output) {
-            $name, $ver = $line.split(' ')
+            $name, $ver = $line.split('[|')
             # Write-Output "#### name=$name ver=$ver line=$line\n"
             $ChocolateyPackages[$name] = $ver
         }
@@ -143,14 +144,16 @@ function Add-ChocolateyPackage {
     $packages = Get-ChocolateyPackages
 
     if ($Verbose) {
-        Write-Output "Add-ChocolateyPackage($Package): version=${packages[$Package].toString}"
+        $pkg_info = $packages[$Package]
+        Write-Output "Add-ChocolateyPackage($Package): version=$pkg_info"
     }
 
     if ($packages.Count -eq 0) {
         Write-Output "Add-ChocolateyPackage($Package): chocolatey is not yet installed"
     } elseif ($packages[$Package]) {
         if ($Verbose) {
-            Write-Output "Add-ChocolateyPackage($Package): package already exists and version=${packages[$Package]}"
+            $pkg_ver = $packages[$Package]
+            Write-Output "Add-ChocolateyPackage($Package): package already exists and version=$pkg_ver"
         } 
     } else {
         # 
@@ -345,7 +348,7 @@ foreach ($package in $config.packages) {
 }
 
 foreach ($package in $config.chocolatey) {
-    #Write-Output "pkg=$package"
+    Write-Output "choco pkg=$package"
     Add-ChocolateyPackage $package
 }
 # Add-ChocolateyPackage "awscli"
