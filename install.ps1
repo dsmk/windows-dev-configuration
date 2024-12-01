@@ -246,7 +246,7 @@ function Add-WSLDistribution {
         [string]$Comment
     )
 
-    Enable-WSL
+    #Enable-WSL
     $distros = Get-WSLDistributions
 
     if ($Verbose) {
