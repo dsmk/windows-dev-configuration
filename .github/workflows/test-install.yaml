@@ -13,9 +13,9 @@ jobs:
         uses: actions/checkout@v3
       - name: Install winget
         uses: Cyberboss/install-winget@v1
-        
-    #   - name: Execute PowerShell Configuration Script
-    #     run: "./install.ps1 -Verbose -Elevated -ComputerName validate-config"
+
+      - name: Execute PowerShell Configuration Script
+        run: "./install.ps1 -Verbose -Elevated -ComputerName validate-config"
 
       - name: Execute PowerShell Validation Script
         run: "./validate-install.ps1"
