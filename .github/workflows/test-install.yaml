@@ -1,0 +1,24 @@
+name: Windows 11 System Configuration and Validation
+
+on:
+  push:
+    branches:
+      - main  # Adjust branch name as needed
+
+jobs:
+  configure_and_test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Execute PowerShell Configuration Script
+        uses: actions/powershell@v2
+        with:
+          scriptpath: ./install.ps1 
+          args: '-Verbose -Elevated -ComputerName validate-config'
+
+      - name: Execute PowerShell Validation Script
+        uses: actions/powershell@v2
+        with:
+          scriptpath: ./validate-install.ps1
