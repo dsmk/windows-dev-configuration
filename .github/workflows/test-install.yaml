@@ -11,7 +11,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
+      - name: Install winget
+        uses: Cyberboss/install-winget@v1
+        
     #   - name: Execute PowerShell Configuration Script
     #     run: "./install.ps1 -Verbose -Elevated -ComputerName validate-config"
 
