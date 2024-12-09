@@ -13,12 +13,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Execute PowerShell Configuration Script
-        uses: actions/powershell@v2
-        with:
-          scriptpath: ./install.ps1 
-          args: '-Verbose -Elevated -ComputerName validate-config'
+        run: "./install.ps1 -Verbose -Elevated -ComputerName validate-config"
 
       - name: Execute PowerShell Validation Script
-        uses: actions/powershell@v2
-        with:
-          scriptpath: ./validate-install.ps1
+        run: "./validate-install.ps1"
+        # uses: actions/powershell@v2
+        # with:
+        #   scriptpath: ./validate-install.ps1
