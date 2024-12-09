@@ -200,7 +200,7 @@ function Add-WingetPackage {
             Write-Output "Add-WingetPackage($Label): WOULD install package"
         } else {
             Write-Output "Add-WingetPackage($Label): installing package"
-            winget install $PackageId
+            winget install $PackageId  --accept-source-agreements --accept-package-agreements --disable-interactivity
         }
     }
 }
