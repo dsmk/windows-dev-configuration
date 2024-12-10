@@ -9,16 +9,20 @@ jobs:
   configure_and_test:
     runs-on: windows-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Install winget
-        uses: Cyberboss/install-winget@v1
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Execute PowerShell Configuration Script
-        run: "./install.ps1 -Verbose -Elevated -ComputerName validate-config"
+    - name: Install winget
+      uses: Cyberboss/install-winget@v1
 
-      - name: Execute PowerShell Validation Script
-        run: "./validate-install.ps1"
+    - name: Output Command Path
+      run: "write-output $env:PATH"
+
+    - name: Execute PowerShell Configuration Script
+      run: "./install.ps1 -Verbose -Elevated -ComputerName validate-config"
+
+    - name: Execute PowerShell Validation Script
+      run: "./validate-install.ps1"
         # uses: actions/powershell@v2
         # with:
         #   scriptpath: ./validate-install.ps1

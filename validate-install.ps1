@@ -19,6 +19,7 @@ $architecture = if ($osInfo.OSArchitecture -eq "64-bit") {
 Write-Host "Operating System Type: $osType"
 Write-Host "Operating System Level: $osLevel"
 Write-Host "Architecture: $architecture"
+Write-Host "PATH: $env:PATH"
 Write-Host ""
 
 # There is a way that this is self-referential in that the install script uses similar logic.

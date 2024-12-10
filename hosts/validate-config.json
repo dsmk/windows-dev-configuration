@@ -6,6 +6,7 @@
         "code",
         "git",
         "choco",
+        "node",
         "az",
         "aws",
         "terraform"
@@ -16,7 +17,6 @@
         { "id": "Git.Git", "label": "Git for Windows" },
         { "id": "GitHub.cli", "label": "GitHub.cli" },
 	    { "id": "Google.Chrome", "label": "Google Chrome" },
-        { "id": "9N9Z9NSV47FL", "label": "Liquidtext" },
         { "id": "Microsoft.OneDrive", "label": "Microsoft OneDrive" },
         { "id": "XP99J3KP4XZ4VV", "label": "Microsoft Store Zoom App" },
         { "id": "Microsoft.AzureCLI", "label": "Azure CLI" },
@@ -37,11 +37,6 @@
         { "name": "Ubuntu", "comment": "Latest stable Ubuntu" } 
     ],
     "projects": [
-        { "name": "aws-reinvent-2024", "url": "https://github.com/dsmk/aws-reinvent-2024.git" },
-        { "name": "buaws-istcloud-information", "url": "https://github.com/bu-ist/buaws-istcloud-information.git" },
-        { "name": "buaws-istcloud-infrastructure", "url": "https://github.com/bu-ist/buaws-istcloud-infrastructure.git" },
-        { "name": "ansible-rexden", "url": "https://github.com/dsmk/ansible-rexden.git" },
-        { "name": "rexden-cloud-infrastructure", "url": "https://github.com/dsmk/rexden-cloud-infrastructure.git" },
         { "name": "MagiskOnWSALocal", "url": "https://github.com/LSPosed/MagiskOnWSALocal.git" }
     ]
 }
