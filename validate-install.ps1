@@ -61,6 +61,17 @@ foreach ($cmd in $config.commands) {
     }
 }
 
+# Validate the commands we find on our command line (this part of the json is )
+refreshenv
+foreach ($cmd in $config.commands) {
+    $cmdInstalled = Get-Command $cmd -ErrorAction SilentlyContinue
+    if ($cmdInstalled) {
+        write-Output "OK Command found $cmd"
+    } else {
+        Write-Output "ERR Command not found $cmd"
+        $finalStatusIsError = $true
+    }
+}
 # # Check if Chocolatey packages are installed
 # $chromeInstalled = Get-Command "chrome" -ErrorAction SilentlyContinue
 # $firefoxInstalled = Get-Command "firefox" -ErrorAction SilentlyContinue
