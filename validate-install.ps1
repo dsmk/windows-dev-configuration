@@ -49,19 +49,10 @@ foreach ($package in $config.packages) {
     }
 }
 # Check that the choco packages are installed
+choco list
 
 # Validate the commands we find on our command line (this part of the json is )
-foreach ($cmd in $config.commands) {
-    $cmdInstalled = Get-Command $cmd -ErrorAction SilentlyContinue
-    if ($cmdInstalled) {
-        write-Output "OK Command found $cmd"
-    } else {
-        Write-Output "ERR Command not found $cmd"
-        $finalStatusIsError = $true
-    }
-}
-
-# Validate the commands we find on our command line (this part of the json is )
+#   Run chocolatey's refreshenv to make certain that the current env has every command path in it
 refreshenv
 foreach ($cmd in $config.commands) {
     $cmdInstalled = Get-Command $cmd -ErrorAction SilentlyContinue
@@ -72,6 +63,22 @@ foreach ($cmd in $config.commands) {
         $finalStatusIsError = $true
     }
 }
+
+# Check the project spaces have been set up
+if (Test-Path -Path "$env:PROJ") {
+    Write-Output "OK Projects directory and PROJ env variable have been set up"
+} else {
+    Write-Output "ERR Projects directory not set up or PROJ env variable not set properly"
+    $finalStatusIsError = $true
+}
+
+if (Test-Path -Path "${env:USERPROFILE}\windows-dev-configuration") {
+    Write-Output "OK windows-dev-configuration directory has been set up"
+} else {
+    Write-Output "ERR windows-dev-configuration directory not set up"
+    $finalStatusIsError = $true
+}
+
 # # Check if Chocolatey packages are installed
 # $chromeInstalled = Get-Command "chrome" -ErrorAction SilentlyContinue
 # $firefoxInstalled = Get-Command "firefox" -ErrorAction SilentlyContinue

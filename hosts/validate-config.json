@@ -21,7 +21,6 @@
         { "id": "XP99J3KP4XZ4VV", "label": "Microsoft Store Zoom App" },
         { "id": "Microsoft.AzureCLI", "label": "Azure CLI" },
         { "id": "Microsoft.VisualStudioCode", "label": "Visual Studio Code" },
-        { "id": "OpenJS.NodeJS", "label": "NodeJs" },
         { "id": "Hashicorp.Terraform", "label": "Terraform" },
         { "id": "UbiquitiInc.WiFimanDesktop", "label": "Ubiuiti WiFimanDesktop (used for VPNs for rexden)" },
         { "id": "Yarn.Yarn", "label": "Yarn (for Javascript and other tools)" }
@@ -31,10 +30,8 @@
         { "option": "user.name", "value": "David King" }
     ],
     "optionalfeatures": [
-        "VirtualMachinePlatform"
     ],
     "wsl": [
-        { "name": "Ubuntu", "comment": "Latest stable Ubuntu" } 
     ],
     "projects": [
         { "name": "MagiskOnWSALocal", "url": "https://github.com/LSPosed/MagiskOnWSALocal.git" }
