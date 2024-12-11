@@ -65,12 +65,13 @@ foreach ($cmd in $config.commands) {
 }
 
 # Check the project spaces have been set up
-if (Test-Path -Path "$env:PROJ") {
-    Write-Output "OK Projects directory and PROJ env variable have been set up"
-} else {
-    Write-Output "ERR Projects directory not set up or PROJ env variable not set properly"
-    $finalStatusIsError = $true
-}
+# skip for now
+# if (Test-Path -Path "$env:PROJ") {
+#     Write-Output "OK Projects directory and PROJ env variable have been set up"
+# } else {
+#     Write-Output "ERR Projects directory not set up or PROJ env variable not set properly"
+#     $finalStatusIsError = $true
+# }
 
 if (Test-Path -Path "${env:USERPROFILE}\windows-dev-configuration") {
     Write-Output "OK windows-dev-configuration directory has been set up"

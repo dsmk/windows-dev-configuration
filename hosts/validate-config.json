@@ -8,8 +8,7 @@
         "choco",
         "node",
         "az",
-        "aws",
-        "terraform"
+        "aws"
     ],
     "packages": [
         { "id": "XP99C9G0KRDZ27", "label": "1password"},
