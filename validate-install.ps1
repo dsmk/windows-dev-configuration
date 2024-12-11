@@ -53,6 +53,7 @@ choco list
 
 # Validate the commands we find on our command line (this part of the json is )
 #   Run chocolatey's refreshenv to make certain that the current env has every command path in it
+Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
 refreshenv
 foreach ($cmd in $config.commands) {
     $cmdInstalled = Get-Command $cmd -ErrorAction SilentlyContinue

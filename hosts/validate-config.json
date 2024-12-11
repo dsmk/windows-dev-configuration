@@ -3,7 +3,6 @@
         "awscli"
     ],
     "commands": [
-        "code",
         "git",
         "choco",
         "node",
